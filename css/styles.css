@@ -1,0 +1,30 @@
+r{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    padding: 2rem;
+}
+
+main {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    background-color: #ff8000;
+    color: rgba(243, 246, 243, 0.9);
+
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.5rem;
+    }
+
+}
