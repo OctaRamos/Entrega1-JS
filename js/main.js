@@ -1,53 +1,142 @@
-const nombre = prompt("Ingrese su nombre");
+const PRECIO_DESAYUNO = 20000;
+const PRECIO_TRASLADO = 40000;
+const PRECIO_EXCURSION = 70000;
 
-let dias = parseInt(prompt("Ingrese cantidad de días que desea viajar"));
-let presupuestoDiario = parseFloat(prompt("Ingrese su presupuesto diario"));
-let presupuestoDisponible = parseFloat(prompt("Ingrese cuánto dinero tiene disponible"));
+function pedirNumero(mensaje) {
+    let numero = parseInt(prompt(mensaje));
 
-let presupuestoTotal = dias * presupuestoDiario;
-
-alert("Hola " + nombre + ", necesitarías un presupuesto total de $" + presupuestoTotal);
-
-while (presupuestoTotal > presupuestoDisponible) {
-
-    const dineroFaltante = presupuestoTotal - presupuestoDisponible;
-
-    alert("Tu presupuesto no alcanza. Te faltan $" + dineroFaltante);
-
-    let opcion = parseInt(prompt("¿Qué desea modificar? 1. Días, 2. Presupuesto diario, 3. Presupuesto disponible"));
-
-    if (opcion === 1) {
-        dias = parseInt(prompt("Ingrese nueva cantidad de días"));
-    } else if (opcion === 2) {
-        presupuestoDiario = parseFloat(prompt("Ingrese nuevo presupuesto diario"));
-    } else if (opcion === 3) {
-        presupuestoDisponible = parseFloat(prompt("Ingrese nuevo presupuesto disponible"));
-    } else {
-        alert("Opción incorrecta");
+    while (!(numero > 0)) {
+        numero = parseInt(prompt("Valor inválido. " + mensaje));
     }
 
-    presupuestoTotal = dias * presupuestoDiario;
+    return numero;
 }
 
-const dineroDisponible = presupuestoDisponible - presupuestoTotal;
-
-let adicional = "Ninguno";
-
-if (dineroDisponible >= 70000) {
-    adicional = "Excursión";
-} else if (dineroDisponible >= 40000) {
-    adicional = "Traslado";
-} else if (dineroDisponible >= 20000) {
-    adicional = "Desayuno";
-} else {
-    adicional = "Ninguno";
+function calcularCosto(dias, presupuestoDiario) {
+    return dias * presupuestoDiario;
 }
 
-alert("Viaje aprobado. Costo total: $" + presupuestoTotal + ". Dinero restante: $" + dineroDisponible + ". Adicional disponible: " + adicional);
+const calcularSaldo = (presupuestoDisponible, costoTotal) =>
+    presupuestoDisponible - costoTotal;
 
-console.log("Cliente: " + nombre);
-console.log("Días: " + dias);
-console.log("Presupuesto diario: $" + presupuestoDiario);
-console.log("Costo total: $" + presupuestoTotal);
-console.log("Dinero restante: $" + dineroDisponible);
-console.log("Adicional disponible: " + adicional);
+const mostrarResultado = function(nombre, costoTotal, presupuestoDisponible) {
+    let diferencia = calcularSaldo(presupuestoDisponible, costoTotal);
+
+    if (diferencia >= 0) {
+        alert(nombre + ", tu viaje cuesta $" + costoTotal +
+            " y te quedan $" + diferencia + ".");
+    } else {
+        alert(nombre + ", tu viaje cuesta $" + costoTotal +
+            " y te faltan $" + (-diferencia) + ".");
+    }
+};
+
+function procesarAdicional(opcion, saldo) {
+    let precioAdicional = 0;
+    let nombreAdicional = "";
+
+    switch (opcion) {
+        case "1":
+            precioAdicional = PRECIO_DESAYUNO;
+            nombreAdicional = "Desayuno";
+            break;
+
+        case "2":
+            precioAdicional = PRECIO_TRASLADO;
+            nombreAdicional = "Traslado";
+            break;
+
+        case "3":
+            precioAdicional = PRECIO_EXCURSION;
+            nombreAdicional = "Excursión";
+            break;
+
+        default:
+            alert("Opción inválida.");
+            return saldo;
+    }
+
+    if (saldo >= precioAdicional) {
+        saldo = saldo - precioAdicional;
+
+        alert(nombreAdicional + " agregado. Te quedan $" + saldo + ".");
+    } else {
+        alert("No tenés presupuesto suficiente para agregar " +
+            nombreAdicional + ".");
+    }
+
+    return saldo;
+}
+
+const nombre = prompt("Ingresá tu nombre:");
+
+let dias = pedirNumero("Ingresá la cantidad de días del viaje:");
+let presupuestoDiario = pedirNumero("Ingresá tu presupuesto diario:");
+let presupuestoDisponible = pedirNumero("Ingresá tu presupuesto disponible:");
+
+let costoTotal = calcularCosto(dias, presupuestoDiario);
+
+mostrarResultado(nombre, costoTotal, presupuestoDisponible);
+
+
+while (costoTotal > presupuestoDisponible) {
+
+    let opcion = prompt(
+        "Tu presupuesto no alcanza.\n" +
+        "Elegí una opción:\n" +
+        "1 - Modificar cantidad de días\n" +
+        "2 - Modificar presupuesto diario\n" +
+        "3 - Modificar presupuesto disponible"
+    );
+
+    switch (opcion) {
+        case "1":
+            dias = pedirNumero("Ingresá la nueva cantidad de días:");
+            break;
+
+        case "2":
+            presupuestoDiario = pedirNumero(
+                "Ingresá el nuevo presupuesto diario:"
+            );
+            break;
+
+        case "3":
+            presupuestoDisponible = pedirNumero(
+                "Ingresá el nuevo presupuesto disponible:"
+            );
+            break;
+
+        default:
+            alert("Opción inválida.");
+    }
+
+    costoTotal = calcularCosto(dias, presupuestoDiario);
+
+    mostrarResultado(nombre, costoTotal, presupuestoDisponible);
+}
+
+
+let saldo = calcularSaldo(presupuestoDisponible, costoTotal);
+
+let opcionAdicional = prompt(
+    "Podés agregar adicionales:\n" +
+    "1 - Desayuno ($20000)\n" +
+    "2 - Traslado ($40000)\n" +
+    "3 - Excursión ($70000)\n" +
+    "4 - Finalizar"
+);
+
+while (opcionAdicional !== "4") {
+
+    saldo = procesarAdicional(opcionAdicional, saldo);
+
+    opcionAdicional = prompt(
+        "Elegí otro adicional o finalizá:\n" +
+        "1 - Desayuno ($20000)\n" +
+        "2 - Traslado ($40000)\n" +
+        "3 - Excursión ($70000)\n" +
+        "4 - Finalizar"
+    );
+}
+
+alert(nombre + ", simulación finalizada. Tu saldo restante es $" + saldo + ".");
