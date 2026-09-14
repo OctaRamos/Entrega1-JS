@@ -198,7 +198,9 @@ let opcionAdicional = prompt(
 );
 
 
-while (opcionAdicional !== String(adicionales.length + 1)) {
+let opcionFinalizar = adicionales.length + 1;
+
+while (parseInt(opcionAdicional) !== opcionFinalizar) {
 
     saldo = procesarAdicional(
         opcionAdicional,
