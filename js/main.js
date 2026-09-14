@@ -1,6 +1,35 @@
-const PRECIO_DESAYUNO = 20000;
-const PRECIO_TRASLADO = 40000;
-const PRECIO_EXCURSION = 70000;
+const adicionales = [
+    "Desayuno",
+    "Traslado",
+    "Excursión",
+    "Seguro de viaje",
+    "Late check-out"
+];
+
+const preciosAdicionales = [
+    20000,
+    40000,
+    70000,
+    30000,
+    15000
+];
+
+// Actualización de adicionales disponibles
+
+let adicionalEliminado = adicionales.pop();
+preciosAdicionales.pop();
+
+alert("Se ha eliminado el adicional: " + adicionalEliminado);
+
+adicionales.push("Alquiler de bicicleta");
+preciosAdicionales.push(25000);
+
+adicionales.unshift("Snack de bienvenida");
+preciosAdicionales.unshift(5000);
+
+adicionales.splice(2, 1, "Traslado privado");
+preciosAdicionales.splice(2, 1, 55000);
+
 
 function pedirNumero(mensaje) {
     let numero = parseInt(prompt(mensaje));
@@ -12,12 +41,15 @@ function pedirNumero(mensaje) {
     return numero;
 }
 
+
 function calcularCosto(dias, presupuestoDiario) {
     return dias * presupuestoDiario;
 }
 
+
 const calcularSaldo = (presupuestoDisponible, costoTotal) =>
     presupuestoDisponible - costoTotal;
+
 
 const mostrarResultado = function(nombre, costoTotal, presupuestoDisponible) {
     let diferencia = calcularSaldo(presupuestoDisponible, costoTotal);
@@ -31,48 +63,62 @@ const mostrarResultado = function(nombre, costoTotal, presupuestoDisponible) {
     }
 };
 
-function procesarAdicional(opcion, saldo) {
-    let precioAdicional = 0;
-    let nombreAdicional = "";
 
-    switch (opcion) {
-        case "1":
-            precioAdicional = PRECIO_DESAYUNO;
-            nombreAdicional = "Desayuno";
-            break;
+function mostrarAdicionales(lista, precios) {
+    let mensaje = "Podés agregar adicionales:\n";
+    let indice = 0;
 
-        case "2":
-            precioAdicional = PRECIO_TRASLADO;
-            nombreAdicional = "Traslado";
-            break;
+    for (const adicional of lista) {
+        console.log(
+            "Adicional: " + adicional +
+            " - $" + precios[indice]
+        );
 
-        case "3":
-            precioAdicional = PRECIO_EXCURSION;
-            nombreAdicional = "Excursión";
-            break;
+        mensaje += (indice + 1) + " - " + adicional +
+            " ($" + precios[indice] + ")\n";
 
-        default:
-            alert("Opción inválida.");
-            return saldo;
+        indice++;
     }
+
+    mensaje += (lista.length + 1) + " - Finalizar";
+
+    return mensaje;
+}
+
+
+function procesarAdicional(opcion, saldo, lista, precios) {
+    let indice = parseInt(opcion) - 1;
+
+    if (!(indice >= 0 && indice < lista.length)) {
+        alert("Opción inválida.");
+        return saldo;
+    }
+
+    let nombreAdicional = lista[indice];
+    let precioAdicional = precios[indice];
 
     if (saldo >= precioAdicional) {
         saldo = saldo - precioAdicional;
 
         alert(nombreAdicional + " agregado. Te quedan $" + saldo + ".");
     } else {
-        alert("No tenés presupuesto suficiente para agregar " +
-            nombreAdicional + ".");
+        alert(
+            "No tenés presupuesto suficiente para agregar " +
+            nombreAdicional + "."
+        );
     }
 
     return saldo;
 }
 
+
 const nombre = prompt("Ingresá tu nombre:");
 
 let dias = pedirNumero("Ingresá la cantidad de días del viaje:");
 let presupuestoDiario = pedirNumero("Ingresá tu presupuesto diario:");
-let presupuestoDisponible = pedirNumero("Ingresá tu presupuesto disponible:");
+let presupuestoDisponible = pedirNumero(
+    "Ingresá tu presupuesto disponible:"
+);
 
 let costoTotal = calcularCosto(dias, presupuestoDiario);
 
@@ -91,7 +137,9 @@ while (costoTotal > presupuestoDisponible) {
 
     switch (opcion) {
         case "1":
-            dias = pedirNumero("Ingresá la nueva cantidad de días:");
+            dias = pedirNumero(
+                "Ingresá la nueva cantidad de días:"
+            );
             break;
 
         case "2":
@@ -112,31 +160,64 @@ while (costoTotal > presupuestoDisponible) {
 
     costoTotal = calcularCosto(dias, presupuestoDiario);
 
-    mostrarResultado(nombre, costoTotal, presupuestoDisponible);
-}
-
-
-let saldo = calcularSaldo(presupuestoDisponible, costoTotal);
-
-let opcionAdicional = prompt(
-    "Podés agregar adicionales:\n" +
-    "1 - Desayuno ($20000)\n" +
-    "2 - Traslado ($40000)\n" +
-    "3 - Excursión ($70000)\n" +
-    "4 - Finalizar"
-);
-
-while (opcionAdicional !== "4") {
-
-    saldo = procesarAdicional(opcionAdicional, saldo);
-
-    opcionAdicional = prompt(
-        "Elegí otro adicional o finalizá:\n" +
-        "1 - Desayuno ($20000)\n" +
-        "2 - Traslado ($40000)\n" +
-        "3 - Excursión ($70000)\n" +
-        "4 - Finalizar"
+    mostrarResultado(
+        nombre,
+        costoTotal,
+        presupuestoDisponible
     );
 }
 
-alert(nombre + ", simulación finalizada. Tu saldo restante es $" + saldo + ".");
+
+let adicionalBuscado = prompt(
+    "Ingresá el nombre de un adicional para buscarlo:"
+);
+
+if (adicionales.includes(adicionalBuscado)) {
+    let posicionAdicional = adicionales.indexOf(adicionalBuscado);
+
+    alert(
+        adicionalBuscado +
+        " está disponible en el índice " +
+        posicionAdicional + "."
+    );
+} else {
+    alert("El adicional ingresado no está disponible.");
+}
+
+
+let saldo = calcularSaldo(
+    presupuestoDisponible,
+    costoTotal
+);
+
+let opcionAdicional = prompt(
+    mostrarAdicionales(
+        adicionales,
+        preciosAdicionales
+    )
+);
+
+
+while (opcionAdicional !== String(adicionales.length + 1)) {
+
+    saldo = procesarAdicional(
+        opcionAdicional,
+        saldo,
+        adicionales,
+        preciosAdicionales
+    );
+
+    opcionAdicional = prompt(
+        mostrarAdicionales(
+            adicionales,
+            preciosAdicionales
+        )
+    );
+}
+
+
+alert(
+    nombre +
+    ", simulación finalizada. Tu saldo restante es $" +
+    saldo + "."
+);
