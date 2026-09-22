@@ -1,34 +1,90 @@
-const adicionales = [
-    "Desayuno",
-    "Traslado",
-    "Excursión",
-    "Seguro de viaje",
-    "Late check-out"
-];
+class Adicional {
+    constructor(nombre, precio, categoria, disponible) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.categoria = categoria;
+        this.disponible = disponible;
+    }
 
-const preciosAdicionales = [
+    mostrarInformacion() {
+        return this.nombre + " - $" + this.precio;
+    }
+}
+
+
+const adicional1 = new Adicional(
+    "Desayuno",
     20000,
+    "Comida",
+    true
+);
+
+const adicional2 = new Adicional(
+    "Traslado",
     40000,
+    "Transporte",
+    true
+);
+
+const adicional3 = new Adicional(
+    "Excursión",
     70000,
-    30000,
-    15000
+    "Actividad",
+    true
+);
+
+
+const adicionales = [
+    adicional1,
+    adicional2,
+    adicional3
 ];
 
 // Actualización de adicionales disponibles
 
 let adicionalEliminado = adicionales.pop();
-preciosAdicionales.pop();
 
-alert("Se ha eliminado el adicional: " + adicionalEliminado);
+alert(
+    "Se ha eliminado el adicional: " +
+    adicionalEliminado.nombre
+);
 
-adicionales.push("Alquiler de bicicleta");
-preciosAdicionales.push(25000);
+const adicional4 = new Adicional(
+    "Alquiler de bicicleta",
+    25000,
+    "Actividad",
+    true
+);
 
-adicionales.unshift("Snack de bienvenida");
-preciosAdicionales.unshift(5000);
+adicionales.push(adicional4);
 
-adicionales.splice(2, 1, "Traslado privado");
-preciosAdicionales.splice(2, 1, 55000);
+const adicional5 = new Adicional(
+    "Snack de bienvenida",
+    5000,
+    "Comida",
+    true
+);
+
+adicionales.unshift(adicional5);
+
+const adicional6 = new Adicional(
+    "Traslado privado",
+    55000,
+    "Transporte",
+    true
+);
+
+adicionales.splice(2, 1, adicional6);
+
+// Verificación de las instancias y del método
+
+console.log(adicional1);
+console.log(adicional2);
+console.log(adicional3);
+
+console.log(adicional1.mostrarInformacion());
+console.log(adicional2.mostrarInformacion());
+console.log(adicional3.mostrarInformacion());
 
 
 function pedirNumero(mensaje) {
@@ -64,18 +120,19 @@ const mostrarResultado = function(nombre, costoTotal, presupuestoDisponible) {
 };
 
 
-function mostrarAdicionales(lista, precios) {
+function mostrarAdicionales(lista) {
     let mensaje = "Podés agregar adicionales:\n";
     let indice = 0;
 
     for (const adicional of lista) {
         console.log(
-            "Adicional: " + adicional +
-            " - $" + precios[indice]
+            "Adicional: " + adicional.nombre +
+            " - $" + adicional.precio
         );
 
-        mensaje += (indice + 1) + " - " + adicional +
-            " ($" + precios[indice] + ")\n";
+        mensaje += (indice + 1) + " - " +
+            adicional.nombre +
+            " ($" + adicional.precio + ")\n";
 
         indice++;
     }
@@ -86,7 +143,7 @@ function mostrarAdicionales(lista, precios) {
 }
 
 
-function procesarAdicional(opcion, saldo, lista, precios) {
+function procesarAdicional(opcion, saldo, lista) {
     let indice = parseInt(opcion) - 1;
 
     if (!(indice >= 0 && indice < lista.length)) {
@@ -94,23 +151,25 @@ function procesarAdicional(opcion, saldo, lista, precios) {
         return saldo;
     }
 
-    let nombreAdicional = lista[indice];
-    let precioAdicional = precios[indice];
+    let adicionalSeleccionado = lista[indice];
 
-    if (saldo >= precioAdicional) {
-        saldo = saldo - precioAdicional;
+    if (saldo >= adicionalSeleccionado.precio) {
+        saldo = saldo - adicionalSeleccionado.precio;
 
-        alert(nombreAdicional + " agregado. Te quedan $" + saldo + ".");
+        alert(
+            adicionalSeleccionado.nombre +
+            " agregado. Te quedan $" +
+            saldo + "."
+        );
     } else {
         alert(
             "No tenés presupuesto suficiente para agregar " +
-            nombreAdicional + "."
+            adicionalSeleccionado.nombre + "."
         );
     }
 
     return saldo;
 }
-
 
 const nombre = prompt("Ingresá tu nombre:");
 
@@ -172,9 +231,15 @@ let adicionalBuscado = prompt(
     "Ingresá el nombre de un adicional para buscarlo:"
 );
 
-if (adicionales.includes(adicionalBuscado)) {
-    let posicionAdicional = adicionales.indexOf(adicionalBuscado);
+let posicionAdicional = -1;
 
+for (const adicional of adicionales) {
+    if (adicional.nombre === adicionalBuscado) {
+        posicionAdicional = adicionales.indexOf(adicional);
+    }
+}
+
+if (posicionAdicional !== -1) {
     alert(
         adicionalBuscado +
         " está disponible en el índice " +
@@ -191,10 +256,7 @@ let saldo = calcularSaldo(
 );
 
 let opcionAdicional = prompt(
-    mostrarAdicionales(
-        adicionales,
-        preciosAdicionales
-    )
+    mostrarAdicionales(adicionales)
 );
 
 
@@ -203,17 +265,13 @@ let opcionFinalizar = adicionales.length + 1;
 while (parseInt(opcionAdicional) !== opcionFinalizar) {
 
     saldo = procesarAdicional(
-        opcionAdicional,
-        saldo,
-        adicionales,
-        preciosAdicionales
+    opcionAdicional,
+    saldo,
+    adicionales
     );
 
     opcionAdicional = prompt(
-        mostrarAdicionales(
-            adicionales,
-            preciosAdicionales
-        )
+    mostrarAdicionales(adicionales)
     );
 }
 
