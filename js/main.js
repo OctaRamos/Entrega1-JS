@@ -15,225 +15,140 @@ class Adicional {
     }
 }
 
-const adicional1 = new Adicional("Desayuno", 20000, "Comida", true);
-const adicional2 = new Adicional("Traslado", 40000, "Transporte", true);
-const adicional3 = new Adicional("Excursión", 70000, "Actividad", true);
-
-const adicionales = [
-    adicional1,
-    adicional2,
-    adicional3
+let adicionales = [
+    new Adicional("Desayuno", 20000, "Comida", true),
+    new Adicional("Traslado", 40000, "Transporte", true),
+    new Adicional("Excursión", 70000, "Actividad", true)
 ];
 
-function pedirNumero(mensaje) {
-    let numero = parseInt(prompt(mensaje));
+const contenedorItems = document.getElementById("contenedor-items");
+const formAgregar = document.getElementById("form-agregar");
+const inputNombre = document.getElementById("input-nombre");
+const inputPrecio = document.getElementById("input-precio");
+const inputCategoria = document.getElementById("input-categoria");
+const inputBuscar = document.getElementById("input-buscar");
+const spanTotal = document.getElementById("span-total");
+const spanPromedio = document.getElementById("span-promedio");
+const mensajeFeedback = document.getElementById("mensaje-feedback");
 
-    while (!(numero > 0)) {
-        numero = parseInt(prompt("Valor inválido. " + mensaje));
-    }
-
-    return numero;
+function mostrarFeedback(texto) {
+    mensajeFeedback.innerText = texto;
+    mensajeFeedback.classList.remove("oculto");
+    setTimeout(() => {
+        mensajeFeedback.classList.add("oculto");
+    }, 3000);
 }
 
-const calcularCosto = (dias, presupuestoDiario) => dias * presupuestoDiario;
+function renderizarAdicionales(lista) {
+    contenedorItems.innerHTML = "";
 
-const calcularSaldo = (presupuestoDisponible, costoTotal) => presupuestoDisponible - costoTotal;
-
-const mostrarResultado = (nombre, costoTotal, presupuestoDisponible) => {
-    let diferencia = calcularSaldo(presupuestoDisponible, costoTotal);
-
-    if (diferencia >= 0) {
-        alert(nombre + ", tu viaje cuesta $" + costoTotal + " y te quedan $" + diferencia + ".");
-    } else {
-        alert(nombre + ", tu viaje cuesta $" + costoTotal + " y te faltan $" + (-diferencia) + ".");
-    }
-};
-
-function mostrarAdicionales(lista) {
     if (lista.length === 0) {
-        return "No se encontraron adicionales.";
-    }
-
-    let mensaje = "--- ADICIONALES EN CATÁLOGO ---\n";
-    let indice = 0;
-
-    for (const adicional of lista) {
-        mensaje += (indice + 1) + " - " + adicional.mostrarInformacion() + "\n";
-        indice++;
-    }
-
-    return mensaje;
-}
-
-function buscarAdicionalPorNombre(lista) {
-    let nombreBuscado = prompt("Ingresá el nombre del adicional a buscar:");
-
-    if (!nombreBuscado) return;
-
-    let encontrado = lista.find(item => item.nombre.toLowerCase() === nombreBuscado.toLowerCase());
-
-    if (encontrado) {
-        console.log("Resultado de búsqueda (find):", encontrado);
-        alert("¡Encontrado!\n" + encontrado.mostrarInformacion());
-    } else {
-        alert("No se encontró ningún adicional con el nombre '" + nombreBuscado + "'.");
-    }
-}
-
-function filtrarAdicionalesPorPrecio(lista) {
-    let precioMaximo = pedirNumero("Ingresá el precio máximo que estás dispuesto a pagar:");
-
-    let filtrados = lista.filter(item => item.precio <= precioMaximo);
-
-    console.log("Adicionales filtrados por precio <=" + precioMaximo + ":", filtrados);
-
-    if (filtrados.length > 0) {
-        alert("Adicionales con precio hasta $" + precioMaximo + ":\n\n" + mostrarAdicionales(filtrados));
-    } else {
-        alert("No hay adicionales disponibles por un precio menor o igual a $" + precioMaximo + ".");
-    }
-}
-
-function verEstadisticasAdicionales(lista) {
-    if (lista.length === 0) {
-        alert("No hay adicionales cargados para calcular estadísticas.");
+        contenedorItems.innerHTML = "<p>No hay adicionales disponibles.</p>";
+        actualizarEstadisticas([]);
         return;
     }
 
-    let categorias = lista.map(item => item.categoria);
+    lista.forEach((item, index) => {
+        let tarjeta = document.createElement("div");
+        tarjeta.className = "card-adicional";
+        tarjeta.innerHTML = `
+            <h3>${item.nombre}</h3>
+            <p>Categoría: ${item.categoria}</p>
+            <p>Precio: $${item.precio}</p>
+            <button onclick="eliminarAdicional(${index})">Eliminar</button>
+        `;
+        contenedorItems.appendChild(tarjeta);
+    });
 
+    actualizarEstadisticas(lista);
+}
+
+const inputPrecioMax = document.getElementById("input-precio-max");
+const btnFiltrar = document.getElementById("btn-filtrar");
+const btnReset = document.getElementById("btn-reset");
+
+btnFiltrar.addEventListener("click", () => {
+    let precioMaximo = Number(inputPrecioMax.value);
+
+    if (!precioMaximo) {
+        alert("Ingresa un precio máximo válido.");
+        return;
+    }
+
+    let filtrados = adicionales.filter(item => item.precio <= precioMaximo);
+    renderizarAdicionales(filtrados);
+});
+
+btnReset.addEventListener("click", () => {
+    inputBuscar.value = "";
+    inputPrecioMax.value = "";
+    renderizarAdicionales(adicionales);
+});
+
+function actualizarEstadisticas(lista) {
     let costoTotalAdicionales = lista.reduce((acumulado, item) => acumulado + item.precio, 0);
+    let precioPromedio = lista.length > 0 ? costoTotalAdicionales / lista.length : 0;
 
-    let precioPromedio = costoTotalAdicionales / lista.length;
+    spanTotal.innerText = `$${costoTotalAdicionales}`;
+    spanPromedio.innerText = `$${precioPromedio.toFixed(0)}`;
+}
 
-    console.log("Categorías mapeadas (map):", categorias);
-    console.log("Costo total de adicionales (reduce):", costoTotalAdicionales);
+formAgregar.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-    alert(
-        "--- ESTADÍSTICAS DEL CATÁLOGO ---\n\n" +
-        "• Cantidad total de adicionales: " + lista.length + "\n" +
-        "• Categorías presentes: " + categorias.join(", ") + "\n" +
-        "• Suma total de precios: $" + costoTotalAdicionales + "\n" +
-        "• Precio promedio: $" + precioPromedio.toFixed(2)
+    let nombre = inputNombre.value;
+    let precio = Number(inputPrecio.value);
+    let categoria = inputCategoria.value;
+
+    let nuevoAdicional = new Adicional(nombre, precio, categoria, true);
+    adicionales.push(nuevoAdicional);
+
+    renderizarAdicionales(adicionales);
+    formAgregar.reset();
+    mostrarFeedback("¡" + nombre + " fue agregado con éxito!");
+});
+
+function eliminarAdicional(index) {
+    let eliminado = adicionales.splice(index, 1);
+    renderizarAdicionales(adicionales);
+    mostrarFeedback("Se eliminó " + eliminado[0].nombre + " del catálogo.");
+}
+
+inputBuscar.addEventListener("input", (e) => {
+    let textoBuscado = e.target.value.toLowerCase();
+    let filtrados = adicionales.filter(item =>
+        item.nombre.toLowerCase().includes(textoBuscado)
     );
-}
+    renderizarAdicionales(filtrados);
+});
 
-function agregarAdicionalUsuario(lista) {
-    let nombre = prompt("Ingresá el nombre del adicional:");
-    
-    if (nombre) {
-        let precio = pedirNumero("Ingresá el precio:");
-        let categoria = prompt("Ingresá la categoría (ej: Comida, Transporte, Actividad):");
+renderizarAdicionales(adicionales);
 
-        let nuevoAdicional = new Adicional(nombre, precio, categoria, true);
-        lista.push(nuevoAdicional);
+const inputDias = document.getElementById("input-dias");
+const inputPresupuestoDiario = document.getElementById("input-presupuesto-diario");
+const inputPresupuestoDisponible = document.getElementById("input-presupuesto-disponible");
+const btnCalcularViaje = document.getElementById("btn-calcular-viaje");
+const resultadoViaje = document.getElementById("resultado-viaje");
 
-        alert("¡" + nombre + " fue agregado con éxito!");
+const calcularCosto = (dias, presupuestoDiario) => dias * presupuestoDiario;
+const calcularSaldo = (presupuestoDisponible, costoTotal) => presupuestoDisponible - costoTotal;
+
+btnCalcularViaje.addEventListener("click", () => {
+    let dias = Number(inputDias.value);
+    let presupuestoDiario = Number(inputPresupuestoDiario.value);
+    let presupuestoDisponible = Number(inputPresupuestoDisponible.value);
+
+    if (dias <= 0 || presupuestoDiario <= 0 || presupuestoDisponible <= 0) {
+        resultadoViaje.innerText = "Por favor, completa todos los campos con valores válidos.";
+        return;
     }
-}
-
-function eliminarAdicionalUsuario(lista) {
-    if (lista.length === 0) {
-        alert("No hay adicionales para eliminar.");
-    } else {
-        let mensaje = "Elegí el número del adicional que querés eliminar:\n" + mostrarAdicionales(lista);
-        let opcion = parseInt(prompt(mensaje)) - 1;
-
-        if (opcion >= 0 && opcion < lista.length) {
-            let eliminado = lista.splice(opcion, 1);
-            alert("Se eliminó " + eliminado[0].nombre + " del catálogo.");
-        } else {
-            alert("Opción inválida.");
-        }
-    }
-}
-
-function aplicarDescuentoAdicional(lista) {
-    if (lista.length === 0) {
-        alert("No hay adicionales disponibles.");
-    } else {
-        let mensaje = "Elegí el adicional al que querés aplicarle un descuento:\n" + mostrarAdicionales(lista);
-        let indice = parseInt(prompt(mensaje)) - 1;
-
-        if (indice >= 0 && indice < lista.length) {
-            let porcentaje = pedirNumero("Ingresá el porcentaje de descuento (ej: 10, 15, 20):");
-            lista[indice].aplicarDescuento(porcentaje);
-            alert("¡Descuento aplicado! Nuevo precio de " + lista[indice].nombre + ": $" + lista[indice].precio);
-        } else {
-            alert("Opción inválida.");
-        }
-    }
-}
-
-function simularPresupuesto(nombreUsuario) {
-    let dias = pedirNumero("Ingresá la cantidad de días del viaje:");
-    let presupuestoDiario = pedirNumero("Ingresá tu presupuesto diario:");
-    let presupuestoDisponible = pedirNumero("Ingresá tu presupuesto disponible:");
 
     let costoTotal = calcularCosto(dias, presupuestoDiario);
+    let diferencia = calcularSaldo(presupuestoDisponible, costoTotal);
 
-    mostrarResultado(nombreUsuario, costoTotal, presupuestoDisponible);
-}
-
-let nombreUsuario = prompt("¡Bienvenido al Simulador de Viajes! Ingresá tu nombre:");
-
-if (nombreUsuario) {
-    let opcion = "";
-
-    while (opcion !== "0") {
-        opcion = prompt(
-            "Hola " + nombreUsuario + ", elegí una opción del menú:\n\n" +
-            "1 - Ver adicionales disponibles\n" +
-            "2 - Buscar adicional por nombre (find)\n" +
-            "3 - Filtrar adicionales por precio máximo (filter)\n" +
-            "4 - Ver estadísticas del catálogo (map & reduce)\n" +
-            "5 - Agregar un adicional personalizado\n" +
-            "6 - Quitar un adicional de la lista\n" +
-            "7 - Aplicar descuento a un adicional\n" +
-            "8 - Simular presupuesto de viaje\n" +
-            "0 - Salir"
-        );
-
-        switch (opcion) {
-            case "1":
-                alert(mostrarAdicionales(adicionales));
-                break;
-
-            case "2":
-                buscarAdicionalPorNombre(adicionales);
-                break;
-
-            case "3":
-                filtrarAdicionalesPorPrecio(adicionales);
-                break;
-
-            case "4":
-                verEstadisticasAdicionales(adicionales);
-                break;
-
-            case "5":
-                agregarAdicionalUsuario(adicionales);
-                break;
-
-            case "6":
-                eliminarAdicionalUsuario(adicionales);
-                break;
-
-            case "7":
-                aplicarDescuentoAdicional(adicionales);
-                break;
-
-            case "8":
-                simularPresupuesto(nombreUsuario);
-                break;
-
-            case "0":
-                alert("Gracias por utilizar el simulador, " + nombreUsuario + ". ¡Hasta pronto!");
-                break;
-
-            default:
-                alert("Opción no válida. Por favor, elegí un número del menú.");
-                break;
-        }
+    if (diferencia >= 0) {
+        resultadoViaje.innerText = `Tu viaje cuesta $${costoTotal} y te sobran $${diferencia}. ¡Presupuesto aprobado!`;
+    } else {
+        resultadoViaje.innerText = `Tu viaje cuesta $${costoTotal} y te faltan $${-diferencia}. ¡Estás excedido!`;
     }
-}
+});

@@ -10,9 +10,74 @@
 </head>
 
 <body>
-    <main>
-        <h1>Simulador de presupuesto de viaje</h1>
-        <p>Calculá cuánto dinero necesitás según la duración de tu viaje y tu presupuesto diario.</p>
+    <main class="container">
+
+        <div id="mensaje-feedback" class="feedback oculto"></div>
+
+        <section class="budget-section">
+            <h2>Simulador de Presupuesto</h2>
+            <div class="input-group">
+                <label for="input-dias">Cantidad de días:</label>
+                <input type="number" id="input-dias" placeholder="Ej: 7" min="1">
+            </div>
+            <div class="input-group">
+                <label for="input-presupuesto-diario">Presupuesto diario:</label>
+                <input type="number" id="input-presupuesto-diario" placeholder="Ej: 15000" min="0">
+            </div>
+            <div class="input-group">
+                <label for="input-presupuesto-disponible">Dinero total disponible:</label>
+                <input type="number" id="input-presupuesto-disponible" placeholder="Ej: 150000" min="0">
+            </div>
+            <button id="btn-calcular-viaje">Calcular Presupuesto</button>
+            <p id="resultado-viaje" class="resultado-viaje"></p>
+        </section>
+        <h1>Simulador de Adicionales</h1>
+
+        <section class="filter-section">
+            <h2>Filtrar Catálogo</h2>
+            <div class="input-group">
+                <input type="text" id="input-buscar" placeholder="Buscar por nombre...">
+            </div>
+            <div class="input-group">
+                <input type="number" id="input-precio-max" placeholder="Precio máximo ej: 50000">
+                <button id="btn-filtrar">Filtrar por Precio</button>
+                <button id="btn-reset">Ver Todos</button>
+            </div>
+        </section>
+
+        <section class="list-section">
+            <h2>Lista de Adicionales</h2>
+            <div id="contenedor-items">
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <h2>Estadísticas del Simulador</h2>
+            <p>Costo Total: <span id="span-total">$0</span></p>
+            <p>Precio Promedio: <span id="span-promedio">$0</span></p>
+        </section>
+
+        <section class="form-section">
+            <h2>Agregar Nuevo Adicional</h2>
+            <form id="form-agregar">
+                <div class="input-group">
+                    <label for="input-nombre">Nombre:</label>
+                    <input type="text" id="input-nombre" placeholder="Ej: Seguro de viaje" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="input-precio">Precio:</label>
+                    <input type="number" id="input-precio" placeholder="Ej: 15000" required min="0">
+                </div>
+
+                <div class="input-group">
+                    <label for="input-categoria">Categoría:</label>
+                    <input type="text" id="input-categoria" placeholder="Ej: Asistencia" required>
+                </div>
+
+                <button type="submit" id="btn-agregar">+ Agregar Adicional</button>
+            </form>
+        </section>
     </main>
 </body>
 
